@@ -19,6 +19,23 @@ function  dhis2API(){
             })  
         }
     }
+
+
+    this.getManifest = function(){
+        var ajax = new _ajax("./");
+        
+        return new Promise((resolve,reject) => {
+            ajax.get("manifest.webapp",function(error,response,body){
+                if(!error){
+                    resolve(body)
+                }else{
+                        reject(error)
+                }
+            })
+        })  
+    }
+    
+    
     this.dataElementService = function(){
 
         this.getDataElements = function(fields,filter){
@@ -177,7 +194,7 @@ function  dhis2API(){
                 return new Promise((resolve,reject) => {
                     ajax.get("dataStore/"+dataStoreName+"/"+key,function(error,response,body){
                         if (error){
-                            reject(error);
+                            resolve(error);
                         }else{
                             resolve(body);
                         }
@@ -195,19 +212,23 @@ function  dhis2API(){
         }
         this.saveOrUpdate = function(jsonObj,callback){
 
-            //TODO
-            jsonObj.key = Math.floor(Math.random(0)*100000);
-debugger
+        
            ajax.update("dataStore/"+dataStoreName+"/"+jsonObj.key,jsonObj,function(error,response,body){
                 if (error || body.status == "ERROR"){
                     // may be key not exist
-                    ajax.save("dataStore/"+dataStoreName+"/"+jsonObj.key,jsonObj,function(error,response,body){
+                    ajax.post("dataStore/"+dataStoreName+"/"+jsonObj.key,jsonObj,function(error,response,body){
                         if (error){
                             console.log("Couldn't save data store key value")
+                            callback(error,null,null)
                             return
+                        }else{
+                            callback(error,response,body)
                         }
-                        debugger
+                        
                     })
+                }else{
+                    console.log("Updated Key")
+                    callback(error,response,body)
                 }
             })
             
