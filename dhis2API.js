@@ -29,7 +29,7 @@ function  dhis2API(){
                 if(!error){
                     resolve(body)
                 }else{
-                        reject(error)
+                    reject(error)
                 }
             })
         })  
@@ -84,6 +84,34 @@ function  dhis2API(){
 
     this.sqlViewService = function(){
 
+        this.dip = function(prefix,query,success){
+
+            var sqlViewTemplate =
+                {
+                    "name": prefix+Math.random(1),
+                    "sqlQuery": query,
+                    "displayName": "temp",
+                    "description": "temp",
+                    "type": "QUERY"
+                }
+            
+            this.create(sqlViewTemplate,((error,response,body) =>{
+                if (error){success(error,response,body)}
+                var uid = body.response.uid;
+                this.getData(uid,((error,response,body) => {
+                    success(null,response,body);
+                }))
+                
+                setTimeout(() =>{
+                    this.remove(uid,function(error,response,body){
+                        if (error){
+                            console.log("Could not delete SQLView"+error);
+                        }
+                    })
+                },100)
+            }))
+            
+        }
         this.getData = function(uid,callback){
             ajax.get("sqlViews/"+uid+"/data",callback);
 
@@ -91,7 +119,7 @@ function  dhis2API(){
         
         this.create = function(sqlViewObj,callback){
 
-            ajax.post("sqlViews?",JSON.stringify(sqlViewObj),callback);
+            ajax.post("sqlViews?",(sqlViewObj),callback);
             
         }
 
@@ -109,7 +137,7 @@ function  dhis2API(){
             case "Monthly" :
                 debugger
                 return  getMonthlyPeriods();
-                default :
+            default :
                 return  getMonthlyPeriods();
                 
                 
@@ -175,9 +203,9 @@ function  dhis2API(){
                 }))
             })
         }
+        
+        function getKeys(callback){
             
-            function getKeys(callback){
-                                    
             ajax.get("dataStore",function(error,body,response){
                 if (error){
                 }else{
@@ -189,7 +217,7 @@ function  dhis2API(){
 
         this.getValue = function(key,callback){
             if (callback){
-                    ajax.get("dataStore/"+dataStoreName+"/"+key,callback)
+                ajax.get("dataStore/"+dataStoreName+"/"+key,callback)
             }else{
                 return new Promise((resolve,reject) => {
                     ajax.get("dataStore/"+dataStoreName+"/"+key,function(error,response,body){
@@ -202,7 +230,7 @@ function  dhis2API(){
 
                 })
             }
-                
+            
         }
         
 
@@ -212,8 +240,8 @@ function  dhis2API(){
         }
         this.saveOrUpdate = function(jsonObj,callback){
 
-        
-           ajax.update("dataStore/"+dataStoreName+"/"+jsonObj.key,jsonObj,function(error,response,body){
+            
+            ajax.update("dataStore/"+dataStoreName+"/"+jsonObj.key,jsonObj,function(error,response,body){
                 if (error || body.status == "ERROR"){
                     // may be key not exist
                     ajax.post("dataStore/"+dataStoreName+"/"+jsonObj.key,jsonObj,function(error,response,body){
