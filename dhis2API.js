@@ -5,6 +5,24 @@ function  dhis2API(){
 
     var ajax = new _ajax("../../");
 
+    this.wrapper = function(){
+        this.getObj = function(param,callback){
+            if (callback){
+                ajax.get(param,callback);
+                return;
+            }
+            
+            return new Promise((resolve,reject) => {
+                ajax.get(param,function(error,response,body){
+                    if(!error){
+                        resolve(body)
+                    }else{
+                        reject(error)
+                    }
+                })
+            })  
+        }    
+    }
 
     this.metadataService = function(){
         this.getObj = function(param){
