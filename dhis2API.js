@@ -102,10 +102,8 @@ function  dhis2API(){
 
     this.sqlViewService = function(){
 
-        this.dip = function(prefix,query,success,timeout){
-            if (!timeout){
-                timeout=100;
-            }
+        this.dip = function(prefix,query,success){
+            
             
             var sqlViewTemplate =
                 {
@@ -120,16 +118,13 @@ function  dhis2API(){
                 if (error){success(error,response,body)}
                 var uid = body.response.uid;
                 this.getData(uid,((error,response,body) => {
-                    success(null,response,body);
-                }))
-                
-                setTimeout(() =>{
+                    success(error,response,body);
                     this.remove(uid,function(error,response,body){
                         if (error){
                             console.log("Could not delete SQLView"+error);
                         }
                     })
-                },timeout)
+                }))                
             }))
             
         }
