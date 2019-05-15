@@ -102,8 +102,11 @@ function  dhis2API(){
 
     this.sqlViewService = function(){
 
-        this.dip = function(prefix,query,success){
-
+        this.dip = function(prefix,query,success,timeout){
+            if (!timeout){
+                timeout=100;
+            }
+            
             var sqlViewTemplate =
                 {
                     "name": prefix+Math.random(1),
@@ -126,7 +129,7 @@ function  dhis2API(){
                             console.log("Could not delete SQLView"+error);
                         }
                     })
-                },100)
+                },timeout)
             }))
             
         }
