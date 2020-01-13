@@ -21,7 +21,41 @@ function  dhis2API(){
                     }
                 })
             })  
-        }    
+        }
+
+        this.putObj = function(param,obj,callback){
+            if (callback){
+                ajax.update(param,obj,callback);
+                return;
+            }
+            
+            return new Promise((resolve,reject) => {
+                ajax.update(param,obj,function(error,response,body){
+                    if(!error){
+                        resolve(body)
+                    }else{
+                        reject(error)
+                    }
+                })
+            })  
+        }
+
+        this.postObj = function(param,obj,callback){
+            if (callback){
+                ajax.post(param,obj,callback);
+                return;
+            }
+            
+            return new Promise((resolve,reject) => {
+                ajax.post(param,obj,function(error,response,body){
+                    if(!error){
+                        resolve(body)
+                    }else{
+                        reject(error)
+                    }
+                })
+            })  
+        }
     }
 
     this.metadataService = function(){
